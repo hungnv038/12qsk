@@ -1,0 +1,7 @@
+.ui-layout-container {
+    background: red;
+    height: 500px;
+}
+.ui-layout-west {
+    width: 30%;
+}

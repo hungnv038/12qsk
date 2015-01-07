@@ -10,6 +10,7 @@ class CacheAccessor {
 
     private static $instance;
     private $redis;
+    private $prefix='';
 
     private $available_keys=array(
         'chanel','device','movie');
@@ -23,12 +24,13 @@ class CacheAccessor {
 
     public function __construct() {
         $this->redis = Redis::connection();
+        $this->prefix=Config::get('cache.prefix');
     }
 
     // get value store on redis cache
     public function get($group,$key) {
         if(in_array($group,$this->available_keys)) {
-            $cache_key=$group.":".$key;
+            $cache_key=$this->prefix.":".$group.":".$key;
             if($this->redis->exists($cache_key)) {
                 $result= $this->redis->get($cache_key);
                 return (object)json_decode($result);
@@ -47,7 +49,7 @@ class CacheAccessor {
      */
     public function set($group,$key, $value) {
         if(in_array($group,$this->available_keys)) {
-            $cacheKey = $group.":".$key;
+            $cacheKey = $this->prefix.":".$group.":".$key;
             $this->redis->set($cacheKey, json_encode($value,JSON_UNESCAPED_UNICODE));
         } else {
             throw new Exception("{$group} is not support");
@@ -61,7 +63,7 @@ class CacheAccessor {
      */
     public function exists($group,$key) {
         if(in_array($group,$this->available_keys)) {
-            $cacheKey = $group.":".$key;
+            $cacheKey = $this->prefix.":".$group.":".$key;
             if($this->redis->exists($cacheKey)) {
                 return true;
             } else {
@@ -83,7 +85,7 @@ class CacheAccessor {
      */
     public function zRevRangebyScore($group,$key, $max_score, $min_score, $offset=-1, $count=-1) {
         if(in_array($group,$this->available_keys)) {
-            $cacheKey = $group.":".$key;
+            $cacheKey = $this->prefix.":".$group.":".$key;
             if($count==-1) {
                 $result = $this->redis->zrevrangebyscore($cacheKey,
                     (string)$max_score, (string)$min_score, array());
@@ -109,7 +111,7 @@ class CacheAccessor {
      */
     public function zRangebyScore($group,$key, $min_score, $max_score, $offset=-1, $count=-1) {
         if(in_array($group,$this->available_keys)) {
-            $cacheKey = $group.":".$key;
+            $cacheKey = $this->prefix.":".$group.":".$key;
             if($count==-1) {
                 $result = $this->redis->zrangebyscore($cacheKey, $min_score, $max_score, array());
             } else {
@@ -129,7 +131,7 @@ class CacheAccessor {
      */
     public function zAdd($group,$key, $score, $value) {
         if(in_array($group,$this->available_keys)) {
-            $cacheKey = $group.":".$key;
+            $cacheKey = $this->prefix.":".$group.":".$key;
                 $this->redis->zadd($cacheKey, $score, $value);
 
         } else {
@@ -140,7 +142,7 @@ class CacheAccessor {
 
     public function zrem($group, $key, $value) {
         if(in_array($group, $this->available_keys)) {
-            $cacheKey = $group .":". $key;
+            $cacheKey = $this->prefix.":".$group .":". $key;
             $this->redis->zrem($cacheKey, $value);
 
         } else {
@@ -151,7 +153,7 @@ class CacheAccessor {
 
     public function zRemRangebyScore($group, $key, $min_score, $max_score) {
         if(in_array($group,$this->available_keys)) {
-            $cacheKey = $group.":".$key;
+            $cacheKey = $this->prefix.":".$group.":".$key;
             $this->redis->zremrangebyscore($cacheKey, $min_score, $max_score);
         } else {
             throw new Exception("{$group} is not support");
@@ -160,7 +162,7 @@ class CacheAccessor {
 
     public function zUpdatebyScore($group,$key,$old_score,$new_score,$new_value) {
         if(in_array($group,$this->available_keys)) {
-            $cacheKey = $group.":".$key;
+            $cacheKey = $this->prefix.":".$group.":".$key;
             $this->redis->zremrangebyscore($cacheKey, $old_score, $old_score);
             $this->redis->zadd($cacheKey, $new_score, $new_value);
         } else {
@@ -171,7 +173,7 @@ class CacheAccessor {
     public function getMinScore($group,$key)
     {
         if (in_array($group, $this->available_keys)) {
-            $cacheKey = $group . ":" . $key;
+            $cacheKey = $this->prefix.":".$group . ":" . $key;
             $values = $this->redis->zrangebyscore($cacheKey, -PHP_INT_MAX, PHP_INT_MAX, array('LIMIT' => array('OFFSET' => 0, 'COUNT' => 1)));
             if (count($values) > 0) {
                 $first_val = $values[0];
@@ -187,7 +189,7 @@ class CacheAccessor {
 
     public function zupdateByValue($group, $key, $valueOld, $valueNew, $scoreNew) {
         if(in_array($group, $this->available_keys)) {
-            $cacheKey = $group .":". $key;
+            $cacheKey = $this->prefix.":".$group .":". $key;
 
             $this->redis->zrem($cacheKey, $valueOld);
             $this->redis->zadd($cacheKey, $scoreNew, $valueNew);

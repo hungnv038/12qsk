@@ -235,4 +235,15 @@ class ModelBase extends DBAccess{
             $this->addToCache($id,$new_object,ModelBase::CALL_ACTION_INSERT);
         }
     }
+
+    public function isValid($id)
+    {
+        $object=$this->getOneObjectByField(array('id'=>$id));
+        if($object) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

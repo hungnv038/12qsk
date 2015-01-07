@@ -8,6 +8,6 @@
  */
 class Constants
 {
-    const MOVIE_VIEW='view';
-    const MOVIE_LIKE='like';
+    const ACTION_VIEW='view';
+    const ACTION_LIKE='like';
 }

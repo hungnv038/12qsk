@@ -13,7 +13,7 @@ class ChanelControllers extends BaseController {
             $name=InputHelper::getInput('name',true);
 
             $chanel=Chanel::getInstance();
-            if($chanel->isValid($name)) {
+            if($chanel->isValidName($name)) {
                 // exist name before ==> throw error
                 throw new APIException("Chanel name already exist",APIException::ERRORCODE_DONE_ALREADY);
             }
@@ -32,9 +32,42 @@ class ChanelControllers extends BaseController {
     }
     public function getList()
     {
-
+        try {
+            $device_id=Device::getInstance()->authentication();
+            $limit=InputHelper::getInput('limit',false,3);
+            $since=InputHelper::getInput('since',false,time());
+        } catch(Exception $e) {
+            return ResponseBuilder::error($e);
+        }
     }
     public function follow($id) {
+        try {
+            $device_id=Device::getInstance()->authentication();
 
+            if(!Chanel::getInstance()->isValid($id)) {
+                throw new APIException("CHANEL ID INVALID",APIException::ERRORCODE_INVALID_INPUT);
+            }
+
+            Device_Chanel::getInstance()->follow($device_id,$id);
+
+            return ResponseBuilder::success();
+        } catch(Exception $e) {
+            return ResponseBuilder::error($e);
+        }
+    }
+    public function unFollow($id) {
+        try {
+            $device_id=Device::getInstance()->authentication();
+
+            if(!Chanel::getInstance()->isValid($id)) {
+                throw new APIException("CHANEL ID INVALID",APIException::ERRORCODE_INVALID_INPUT);
+            }
+
+            Device_Chanel::getInstance()->unFollow($device_id,$id);
+
+            return ResponseBuilder::success();
+        } catch(Exception $e) {
+            return ResponseBuilder::error($e);
+        }
     }
 } 

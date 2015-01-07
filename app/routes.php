@@ -22,6 +22,7 @@ Route::post('/devices','DeviceControllers@register');
 
 // MOVIES CHANEL
 
+Route::post('/chanels/{id}/unfollow','ChanelControllers@unFollow');
 Route::post('/chanels/{id}/follow','ChanelControllers@follow');
 Route::post('/chanels','ChanelControllers@add');
 
@@ -31,7 +32,7 @@ Route::get('/chanels','ChannelControllers@getList');
 // MOVIES
 
 Route::get('/movies/{id}','MovieControllers@get');
-Route::post('/movies/{id}/viewed','MovieControllers@viewed');
+Route::post('/movies/{id}/view','MovieControllers@view');
 Route::post('/movies/{id}/like','MovieControllers@like');
 Route::post('/movies','MovieControllers@add');
 

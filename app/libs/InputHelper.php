@@ -39,14 +39,10 @@ class InputHelper
 
         $header = Request::header();
 
-        if ( Input::has('access_token')) {
-            return Input::get('access_token');
-        } elseif ( Input::has('accesstoken')) {
-            return Input::get('accesstoken');
-        } elseif (array_key_exists('access_token', $header)) {
-            return $header['access_token'][0];
-        } elseif (array_key_exists('accesstoken', $header)) {
-            return $header['accesstoken'][0];
+        if ( Input::has('device_id')) {
+            return Input::get('device_id');
+        }  elseif (array_key_exists('device_id', $header)) {
+            return $header['device_id'][0];
         } else {
             return null;
         }

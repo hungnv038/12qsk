@@ -40,11 +40,11 @@ class Movie extends ModelBase {
     public function updateCount($id,$action,$step) {
         $movie=$this->getOneObjectByField(array('id'=>$id));
         if($movie) {
-            if($action==Constants::MOVIE_VIEW) {
+            if($action==Constants::ACTION_VIEW) {
                 $movie->number_view+=$step;
 
                 $this->addToCache($movie->id,$movie);
-            } elseif($action==Constants::MOVIE_LIKE) {
+            } elseif($action==Constants::ACTION_LIKE) {
                 $movie->number_like+=$step;
 
                 $this->addToCache($movie->id,$movie);

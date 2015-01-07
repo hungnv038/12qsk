@@ -56,14 +56,14 @@ class MovieControllers extends BaseController{
                             'created_at'=>array('now()'),
                             'updated_at'=>array('now()'),
                             'movie_id'=>$id,
-                            'event'=>Constants::MOVIE_LIKE,
+                            'event'=>Constants::ACTION_LIKE,
                             'cnt'=>0
                         ),
                         array(
                             'created_at'=>array('now()'),
                             'updated_at'=>array('now()'),
                             'movie_id'=>$id,
-                            'event'=>Constants::MOVIE_VIEW,
+                            'event'=>Constants::ACTION_VIEW,
                             'cnt'=>0
                         ))
                 );
@@ -78,6 +78,8 @@ class MovieControllers extends BaseController{
     public function get($id)
     {
         try {
+            Device::getInstance()->authentication();
+
             $movie=Movie::getInstance()->getOneObjectByField(array('id'=>$id));
             if(!$movie) {
                 throw new APIException("Movie not found",APIException::ERRORCODE_NOTFOUND);
@@ -88,5 +90,38 @@ class MovieControllers extends BaseController{
             return ResponseBuilder::error($e);
         }
 
+    }
+    public function view($id) {
+        try {
+            $this->movieActionPerform($id,Constants::ACTION_VIEW);
+
+            return ResponseBuilder::success();
+
+        } catch(Exception $e) {
+            return ResponseBuilder::error($e);
+        }
+    }
+    public function like($id) {
+        try {
+            $this->movieActionPerform($id,Constants::ACTION_LIKE);
+
+            return ResponseBuilder::success();
+
+        } catch(Exception $e) {
+            return ResponseBuilder::error($e);
+        }
+    }
+
+    private function movieActionPerform($movie_id,$action) {
+
+        $device_id=Device::getInstance()->authentication();
+
+        if(!Movie::getInstance()->isValid($movie_id)) {
+            throw new APIException("MOVIE ID INVALID",APIException::ERRORCODE_INVALID_INPUT);
+        }
+
+        Device_Movie::getInstance()->registerEvent($device_id,$movie_id,$action);
+
+        Movie_Counter::getInstance()->updateCount($movie_id,$action,1);
     }
 } 

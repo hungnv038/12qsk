@@ -36,7 +36,7 @@ class Device extends ModelBase{
         return $new_obj;
     }
     public function authentication() {
-        $device_id=InputHelper::getInput('device_id',true);
+        $device_id=InputHelper::getAccessToken();
         if(!$this->isValid($device_id)) {
             throw new APIException("INVALID ACCESS TOKEN",APIException::ERRORCODE_INVALID_TOKEN);
         }

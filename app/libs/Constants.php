@@ -10,4 +10,5 @@ class Constants
 {
     const ACTION_VIEW='view';
     const ACTION_LIKE='like';
+    const NUMBER_NEWEST_ITEMS=3;
 }

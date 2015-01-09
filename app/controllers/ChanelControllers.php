@@ -36,6 +36,10 @@ class ChanelControllers extends BaseController {
             $device_id=Device::getInstance()->authentication();
             $limit=InputHelper::getInput('limit',false,3);
             $since=InputHelper::getInput('since',false,time());
+
+            $list=Chanel::getInstance()->getLists($device_id,$since,$limit);
+
+            return ResponseBuilder::success(array('id'=>$device_id,'chanels'=>$list));
         } catch(Exception $e) {
             return ResponseBuilder::error($e);
         }

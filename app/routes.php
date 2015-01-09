@@ -27,7 +27,7 @@ Route::post('/chanels/{id}/follow','ChanelControllers@follow');
 Route::post('/chanels','ChanelControllers@add');
 
 Route::get('/chanels/{id}','ChanelControllers@get');
-Route::get('/chanels','ChannelControllers@getList');
+Route::get('/chanels','ChanelControllers@getList');
 
 // MOVIES
 

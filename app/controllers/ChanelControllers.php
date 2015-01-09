@@ -28,7 +28,20 @@ class ChanelControllers extends BaseController {
 
     }
     public function get($id) {
+        try {
+            $device_id=Device::getInstance()->authentication();
+            if(!Chanel::getInstance()->isValid($id)) {
+                throw new APIException("CHANEL ID INVALID",APIException::ERRORCODE_INVALID_INPUT);
+            }
+            $limit=InputHelper::getInput('limit',false,10);
+            $since=InputHelper::getInput('since',false,time());
+            $response=Chanel::getInstance()->get($id,$since,$limit,$device_id);
 
+            return ResponseBuilder::success($response);
+
+        }catch (Exception $e) {
+            return ResponseBuilder::error($e);
+        }
     }
     public function getList()
     {

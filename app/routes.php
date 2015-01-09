@@ -31,6 +31,7 @@ Route::get('/chanels','ChanelControllers@getList');
 
 // MOVIES
 
+Route::get('/movies/top','MovieControllers@tops');
 Route::get('/movies/{id}','MovieControllers@get');
 Route::post('/movies/{id}/view','MovieControllers@view');
 Route::post('/movies/{id}/like','MovieControllers@like');

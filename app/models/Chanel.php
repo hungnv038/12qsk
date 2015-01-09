@@ -121,6 +121,15 @@ class Chanel extends ModelBase{
         return (object)$item;
     }
 
+    public function get($id,$since,$limit,$device_id) {
+        $chanel=$this->getOneObjectByField(array('id'=>$id));
+        if(!$chanel) {
+            return null;
+        }
+        $is_followed=Device_Chanel::getInstance()->isFollowed($device_id,$id);
+        $movies=Movie::getInstance()->getByChanelId($id,$since,$limit);
+        return $this->composeResponse($chanel,$movies,$is_followed);
+    }
 
 
 } 

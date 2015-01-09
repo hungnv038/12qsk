@@ -124,4 +124,15 @@ class MovieControllers extends BaseController{
 
         Movie_Counter::getInstance()->updateCount($movie_id,$action,1);
     }
+    public function tops() {
+        try {
+            $device_id=Device::getInstance()->authentication();
+
+            $movies=Movie::getInstance()->tops();
+
+            return ResponseBuilder::success(array('id'=>$device_id,'movies'=>$movies));
+        } catch(Exception $e) {
+            return ResponseBuilder::error($e);
+        }
+    }
 } 

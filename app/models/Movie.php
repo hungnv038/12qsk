@@ -51,6 +51,18 @@ class Movie extends ModelBase {
             }
         }
     }
+    public function getByChanelId($chanel_id,$since,$limit) {
+        $sql="select id,title,length,chanel_id,
+                unix_timestamp(created_at) as created_at,
+                unix_timestamp(updated_at) as updated_at
+              from movie
+              where chanel_id=? and unix_timestamp(created_at) < ?
+              order by created_at DESC
+              limit 0, ?";
+        $result=DBConnection::read()->select($sql,array($chanel_id,$since,$limit));
+
+        return $result;
+    }
     public function getChanelMovies($chanel_ids,$limit) {
         if(!is_array($chanel_ids)) {
             $chanel_ids=array($chanel_ids);
@@ -88,6 +100,23 @@ class Movie extends ModelBase {
         $movie['thumb']="http://img.youtube.com/vi/".$movie['id']."/default.jpg";
 
         return (object)$movie;
+    }
+    public function tops() {
+        $sql="select id,title,length,chanel_id,
+                  unix_timestamp(created_at) as created_at,
+                  unix_timestamp(updated_at) as updated_at
+                from movie
+                inner join top_movie on movie.id=top_movie.movie_id
+                order by order DESC
+                limit 0, ?";
+        $result=DBConnection::write()->select($sql,array(Constants::NUMBER_TOP_ITEMS));
+
+        $response=array();
+        foreach ($result as $item) {
+            $response[]=$this->composeResponse($item);
+        }
+
+        return $response;
     }
 
 } 

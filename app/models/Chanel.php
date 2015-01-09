@@ -108,12 +108,13 @@ class Chanel extends ModelBase{
         return $result;
     }
     private function composeResponse($chanel,$movies,$is_followed) {
+        // is_followed is bool type
         if(!is_array($movies)) {
             $movies=array($movies);
         }
 
         $item=(array)$chanel;
-        $item['is_followed']=$is_followed;
+        $item['is_followed']=$is_followed==true?1:0;
         $item['movies']=array();
         foreach ($movies as $movie) {
             $item['movies'][]=Movie::getInstance()->composeResponse($movie);

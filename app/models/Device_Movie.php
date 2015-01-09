@@ -43,7 +43,7 @@ class Device_Movie extends DBAccess{
     public function isExist($device_id,$movie_id,$action) {
         $sql="select count(*) as cnt from device_movie_action where device_id=? and movie_id=? and event=?";
         $result=DBConnection::read()->select($sql,array($device_id,$movie_id,$action));
-        if($result->cnt==0) {
+        if($result[0]->cnt==0) {
             return false;
         } else {
             return true;

@@ -44,7 +44,7 @@ class Device_Chanel extends DBAccess {
     public function isFollowed($device_id,$chanel_id) {
         $sql="select count(*) as cnt from device_chanel where device_id=? and chanel_id=?";
         $result=DBConnection::read()->select($sql,array($device_id,$chanel_id));
-        if($result->cnt>0) {
+        if($result[0]->cnt>0) {
             return true;
         } else {
             return false;

@@ -43,3 +43,12 @@ Route::get('/logs','LogController@getLog');
 Route::get('/apidocs','LogController@getApiDocs');
 Route::get('/getApiDoc','LogController@getApiDoc');
 Route::match(array('GET', 'POST'), '/setApiDoc','LogController@setApiDoc');
+
+// TEST
+Route::get('/test', function() {
+    $offset=Input::get('index');
+    for($i=$offset;$i<$offset+20;$i++) {
+        DBConnection::write()->insert("Insert into movie (created_at,title,length,chanel_id) VALUES (now(),?,6,6)",
+            array("Title "+i));
+    }
+});

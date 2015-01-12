@@ -47,8 +47,10 @@ Route::match(array('GET', 'POST'), '/setApiDoc','LogController@setApiDoc');
 // TEST
 Route::get('/test', function() {
     $offset=Input::get('index');
+    $i=0;
     for($i=$offset;$i<$offset+20;$i++) {
-        DBConnection::write()->insert("Insert into movie (created_at,title,length,chanel_id) VALUES (now(),?,6,6)",
-            array("Title #".i));
+        //$title="Title #".$i;
+        DBConnection::write()->insert("Insert into movie (id,created_at,title,length,chanel_id) VALUES (?,now(),?,6,6)",
+            array("Id #".$i,"Title #".$i));
     }
 });

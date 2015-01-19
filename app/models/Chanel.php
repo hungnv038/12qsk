@@ -43,83 +43,44 @@ class Chanel extends ModelBase{
         return (object)$new_object;
     }
 
-    public function getLists($device_id,$since,$limit) {
-        $followed_ids=array();
-        $chanel_ids=array();
-        $chanels=array();
-        $followeds=$this->getFolloweds($device_id);
+    public function getList($group_id,$device_id,$limit,$loaded_ids,$number_view) {
+        $watched_chanels=$this->getWatchedList($group_id,$device_id,$number_view,$limit,$loaded_ids);
 
-        foreach ($followeds as $item) {
-            $followed_ids[]=$item->id;
-            $chanel_ids[]=$item->id;
-            if($item->created_at < $since) {
-                $chanels[]=$item;
-                if(count($chanels)==$limit) {
-                    break;
-                }
-            }
-            $this->addToCache($item->id,$item,ModelBase::CALL_ACTION_UPDATE);
+        $watched_ids=array();
+        foreach($watched_chanels as $item) {
+            $watched_ids[]=$item->id;
         }
-        if(count($chanels)!=$limit) {
-            // get more from unfollow chanels
-            $unfollows=$this->getUnFollows($since,$limit-count($chanels),$followed_ids);
-
-            foreach ($unfollows as $item) {
-                $chanel_ids[]=$item->id;
-                $chanels[]=$item;
-
-                $this->addToCache($item->id,$item,ModelBase::CALL_ACTION_UPDATE);
-            }
-        }
-        if(count($chanels)==0) {
-            return array();
-        }
-
-        // format data
-        $chanel_movies=Movie::getInstance()->getChanelMovies($chanel_ids,Constants::NUMBER_NEWEST_ITEMS);
+        $group_movies=Movie::getInstance()->getNewestInChanels($watched_ids,Constants::NUMBER_NEWEST_ITEMS);
 
         $response=array();
-        foreach ($chanels as $chanel) {
-            $is_followed=in_array($chanel->id,$followed_ids);
-            $response[]=$this->composeResponse($chanel,$chanel_movies[$chanel->id],$is_followed);
+
+        foreach ($watched_chanels as $item) {
+            $response[]=$this->composeResponse($item,$group_movies[$item->id]);
         }
+
         return $response;
+
     }
-    private function getFolloweds($device_id) {
-        $sql="select chanel.id,chanel.name,
-                unix_timestamp(device_chanel.created_at) as created_at,
-                unix_timestamp(device_chanel.updated_at) as updated_at
-                from chanel
-                inner join device_chanel on chanel.id=device_chanel.chanel_id
-                where device_chanel.device_id=?
-                order by device_chanel.created_at desc";
-        $result=DBConnection::read()->select($sql,array($device_id));
-        return $result;
-    }
-    private function getUnFollows($since,$limit,$follow_ids) {
-        $sql="select id,name,
-                unix_timestamp(created_at) as created_at,
-                unix_timestamp(updated_at) as updated_at
-                from chanel
-                where unix_timestamp(created_at) < ? and id not in ('".implode("','",$follow_ids)."')
-                order by created_at desc
-                limit 0,?";
-        $result=DBConnection::read()->select($sql,array($since,$limit));
-        return $result;
-    }
-    private function composeResponse($chanel,$movies,$is_followed) {
+    private function composeResponse($chanel,$movies) {
         // is_followed is bool type
         if(!is_array($movies)) {
             $movies=array($movies);
         }
 
-        $item=(array)$chanel;
-        $item['is_followed']=$is_followed==true?1:0;
-        $item['movies']=array();
-        foreach ($movies as $movie) {
-            $item['movies'][]=Movie::getInstance()->composeResponse($movie);
+        $chanel=(array)$chanel;
+        $chanel['movies']=array();
+
+        $movie_ids=array();
+        foreach ($movies as $item) {
+            $movie_ids[]=$item->id;
         }
-        return (object)$item;
+
+        $movies=Movie::getInstance()->getObjectsByFields(array('id'=>$movie_ids));
+
+        foreach ($movies as $movie) {
+            $chanel['movies'][]=Movie::getInstance()->composeResponse($movie);
+        }
+        return (object)$chanel;
     }
 
     public function get($id,$since,$limit,$device_id) {
@@ -132,5 +93,19 @@ class Chanel extends ModelBase{
         return $this->composeResponse($chanel,$movies,$is_followed);
     }
 
+    private function getWatchedList($group_id,$device_id,$view_number,$limit,$loaded_ids) {
+        $sql="select chanel.*, count(device_movie_action.id) as count from chanel
+        inner join movie on movie.chanel_id=chanel.id
+        inner join device_movie_action on device_movie_action.movie_id=movie.id
+        where device_movie_action.event=? and device_id=? and chanel.id not in ('".implode($loaded_ids,"','")."')
+        and group_id=?
+        group by chanel.id
+        having count <=?
+        order by count(device_movie_action.id) desc, updated_at desc
+        limit ? offset 0";
 
+        $result=DBConnection::read()->select($sql,array('view',$device_id,$group_id,$view_number,$limit));
+
+        return $result;
+    }
 } 

@@ -63,15 +63,13 @@ class Movie extends ModelBase {
 
         return $result;
     }
-    public function getChanelMovies($chanel_ids,$limit) {
+    public function getNewestInChanels($chanel_ids,$limit) {
         if(!is_array($chanel_ids)) {
             $chanel_ids=array($chanel_ids);
         }
         if(count($chanel_ids)==0) return null;
 
-        $sql="select id,title,length,chanel_id,created_at,updated_at
-              from (
-                  select id,title,length,chanel_id,
+        $sql=" select id,chanel_id,
                   unix_timestamp(created_at) as created_at,
                   unix_timestamp(updated_at) as updated_at,
                   @num := if(@chanel = chanel_id, @num+1, 1) as row_number,
@@ -79,8 +77,8 @@ class Movie extends ModelBase {
                   from movie
                   where chanel_id in ('".implode("','",$chanel_ids)."')
                   group by chanel_id,id
-                  order by chanel_id,created_at desc ) as temp
-                where row_number <= ?";
+                  having row_number<?
+                  order by chanel_id,created_at desc ";
         $result=DBConnection::read()->select($sql,array($limit));
 
         $chanel_movies=array();
@@ -103,8 +101,8 @@ class Movie extends ModelBase {
     }
     public function tops() {
         $sql="select id,title,length,chanel_id,
-                  unix_timestamp(created_at) as created_at,
-                  unix_timestamp(updated_at) as updated_at
+                unix_timestamp(created_at) as created_at,
+                unix_timestamp(updated_at) as updated_at
                 from movie
                 inner join top_movie on movie.id=top_movie.movie_id
                 order by order DESC
@@ -117,6 +115,33 @@ class Movie extends ModelBase {
         }
 
         return $response;
+    }
+    public function getNewestInGroups($group_ids,$limit) {
+        if(!is_array($group_ids)) {
+            $group_ids=array($group_ids);
+        }
+        if(count($group_ids)==0) return null;
+
+        $sql="
+                select movie.id,chanel.group_id,
+                @num := if(@chanel = chanel.group_id, @num+1, 1) as row_number,
+                @chanel := chanel.group_id as row_group
+                from movie
+                inner join chanel on chanel.id=movie.chanel_id
+                where chanel.group_id in ('".implode($group_ids,"','")."')
+                group by chanel.group_id,movie.id
+                having row_number<=?
+                order by chanel.group_id,movie.created_at ";
+        $result=DBConnection::read()->select($sql,array($limit));
+
+        $group_movies=array();
+        foreach ($result as $item) {
+            if(!array_key_exists($item->group_id,$group_movies)) {
+                $group_movies[$item->group_id]=array();
+            }
+            $group_movies[$item->group_id][]=$item;
+        }
+        return $group_movies;
     }
 
 } 

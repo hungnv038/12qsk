@@ -43,20 +43,7 @@ class ChanelControllers extends BaseController {
             return ResponseBuilder::error($e);
         }
     }
-    public function getList()
-    {
-        try {
-            $device_id=Device::getInstance()->authentication();
-            $limit=InputHelper::getInput('limit',false,3);
-            $since=InputHelper::getInput('since',false,time());
 
-            $list=Chanel::getInstance()->getLists($device_id,$since,$limit);
-
-            return ResponseBuilder::success(array('id'=>$device_id,'chanels'=>$list));
-        } catch(Exception $e) {
-            return ResponseBuilder::error($e);
-        }
-    }
     public function follow($id) {
         try {
             $device_id=Device::getInstance()->authentication();
@@ -83,6 +70,25 @@ class ChanelControllers extends BaseController {
             Device_Chanel::getInstance()->unFollow($device_id,$id);
 
             return ResponseBuilder::success();
+        } catch(Exception $e) {
+            return ResponseBuilder::error($e);
+        }
+    }
+    public function getList($chanel_id) {
+        try {
+            $device_id=Device::getInstance()->authentication();
+            $limit=InputHelper::getInput('limit',false,3);
+            $number_view=InputHelper::getInput('number_views',false,0);
+            $loaded_ids=InputHelper::getInput("loadeds",false,array());
+
+            if(!is_array($loaded_ids)) {
+                $loaded_ids = preg_split("/,/", $loaded_ids);
+            }
+            $chanel=Chanel::getInstance();
+
+            $list=$chanel->getList($device_id,$limit,$loaded_ids,$number_view);
+
+            return ResponseBuilder::success(array('id'=>$device_id,'chanels'=>$list));
         } catch(Exception $e) {
             return ResponseBuilder::error($e);
         }

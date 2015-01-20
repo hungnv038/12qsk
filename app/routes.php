@@ -78,9 +78,9 @@ Route::get('/test/device', function() {
 Route::get('/test', function() {
     $offset=Input::get('index');
     $i=0;
-    for($i=$offset;$i<$offset+100;$i++) {
+    for($i=$offset;$i<$offset+200;$i++) {
         //$title="Title #".$i;
-        $chanel_id=rand(1,6);
+        $chanel_id=rand(1,12);
         DBConnection::write()->insert("Insert into movie (id,created_at,title,length,chanel_id) VALUES (?,now(),?,6,?)",
             array("Id #".$i,"Title #".$i,$chanel_id));
     }

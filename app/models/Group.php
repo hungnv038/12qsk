@@ -25,14 +25,14 @@ class Group extends ModelBase{
         select chanel_group.*,
         unix_timestamp(chanel_group.created_at) as created_at,
         unix_timestamp(chanel_group.updated_at) as updated_at,
-        count(device_movie_action.id) as cnt
+        count(device_movie_action.id) as number_view
         from chanel_group
         inner join chanel on chanel.group_id=chanel_group.id
         inner join movie on movie.chanel_id=chanel.id
         inner join device_movie_action on device_movie_action.movie_id=movie.id
         where device_movie_action.event=? and device_id=? and chanel_group.id not in ('".implode($loaded_ids,"','")."')
         group by chanel_group.id
-        having cnt <=?
+        having number_view <=?
         order by count(device_movie_action.id) desc, updated_at desc
         limit ? offset 0
         ";

@@ -69,15 +69,15 @@ class Movie extends ModelBase {
         }
         if(count($chanel_ids)==0) return null;
 
+        DBConnection::write()->select("set @num=0,@chanel=0");
+
         $sql=" select id,chanel_id,
-                  unix_timestamp(created_at) as created_at,
-                  unix_timestamp(updated_at) as updated_at,
                   @num := if(@chanel = chanel_id, @num+1, 1) as row_number,
                   @chanel := chanel_id as chanel
                   from movie
                   where chanel_id in ('".implode("','",$chanel_ids)."')
                   group by chanel_id,id
-                  having row_number<?
+                  having @num<?
                   order by chanel_id,created_at desc ";
         $result=DBConnection::read()->select($sql,array($limit));
 
@@ -121,6 +121,8 @@ class Movie extends ModelBase {
             $group_ids=array($group_ids);
         }
         if(count($group_ids)==0) return null;
+
+        DBConnection::write()->select("set @num=0,@chanel=0");
 
         $sql="
                 select movie.id,chanel.group_id,

@@ -83,24 +83,27 @@ class Chanel extends ModelBase{
         return (object)$chanel;
     }
 
-    public function get($id,$since,$limit,$device_id) {
+    public function get($id,$since,$limit) {
         $chanel=$this->getOneObjectByField(array('id'=>$id));
         if(!$chanel) {
             return null;
         }
-        $is_followed=Device_Chanel::getInstance()->isFollowed($device_id,$id);
         $movies=Movie::getInstance()->getByChanelId($id,$since,$limit);
-        return $this->composeResponse($chanel,$movies,$is_followed);
+        return $this->composeResponse($chanel,$movies);
     }
 
     private function getWatchedList($group_id,$device_id,$view_number,$limit,$loaded_ids) {
-        $sql="select chanel.*, count(device_movie_action.id) as count from chanel
+        $sql="select chanel.*,
+        unix_timestamp(chanel.created_at) as created_at,
+        unix_timestamp(chanel.updated_at) as updated_at,
+        count(device_movie_action.id) as number_view
+        from chanel
         inner join movie on movie.chanel_id=chanel.id
         inner join device_movie_action on device_movie_action.movie_id=movie.id
         where device_movie_action.event=? and device_id=? and chanel.id not in ('".implode($loaded_ids,"','")."')
         and group_id=?
         group by chanel.id
-        having count <=?
+        having number_view <=?
         order by count(device_movie_action.id) desc, updated_at desc
         limit ? offset 0";
 

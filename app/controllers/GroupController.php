@@ -12,7 +12,7 @@ class GroupController extends BaseController{
         try {
             $device_id=Device::getInstance()->authentication();
             $limit=InputHelper::getInput('limit',false,3);
-            $number_view=InputHelper::getInput('views',false,0);
+            $number_view=InputHelper::getInput('views',false,PHP_INT_MAX);
             $loaded_ids=InputHelper::getInput("loaded_ids",false,array());
 
             if(!is_array($loaded_ids)) {

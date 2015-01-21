@@ -96,6 +96,8 @@ class Movie extends ModelBase {
         // input is object, not array
         if(isset($movie->row_number)) unset($movie->row_number);
         if(isset($movie->chanel)) unset($movie->chanel);
+        if(isset($movie->group_id)) unset($movie->group_id);
+        if(isset($movie->row_chanel)) unset($movie->row_chanel);
         $movie=(array)$movie;
         $movie['thumb']="http://img.youtube.com/vi/".$movie['id']."/default.jpg";
 

@@ -96,6 +96,7 @@ class Chanel extends ModelBase{
         $chanel->created_at=intval($chanel->created_at);
         $chanel->updated_at=intval($chanel->updated_at);
         $chanel->number_view=intval($chanel->number_view);
+        $chanel->group_id=intval($chanel->group_id);
 
         return $chanel;
     }

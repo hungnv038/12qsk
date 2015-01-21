@@ -69,16 +69,20 @@ class Movie extends ModelBase {
         }
         if(count($chanel_ids)==0) return null;
 
-        DBConnection::write()->select("set @num=0,@chanel=0");
+        DBConnection::write()->select("set @num:=0,@chanel:=0");
 
-        $sql=" select id,chanel_id,
-                  @num := if(@chanel = chanel_id, @num+1, 1) as row_number,
-                  @chanel := chanel_id as chanel
-                  from movie
-                  where chanel_id in ('".implode("','",$chanel_ids)."')
-                  group by chanel_id,id
-                  having @num<?
-                  order by chanel_id,created_at desc ";
+        $sql=" select *
+                from (
+                    select id,title,length,chanel_id,
+                    unix_timestamp(created_at) as created_at,
+                    unix_timestamp(updated_at) as updated_at,
+                    @num := if(@chanel = chanel_id, @num+1, 1) as row_number,
+                    @chanel := chanel_id as chanel
+                    from movie
+                    where chanel_id in ('".implode($chanel_ids,"','")."')
+                    group by chanel_id,created_at desc,id) as f
+                where row_number<=?
+                order by chanel_id,created_at desc,id";
         $result=DBConnection::read()->select($sql,array($limit));
 
         $chanel_movies=array();
@@ -122,21 +126,28 @@ class Movie extends ModelBase {
         }
         if(count($group_ids)==0) return null;
 
-        DBConnection::write()->select("set @num=0,@chanel=0");
+        DBConnection::write()->select("set @num:=0,@chanel:=0");
 
         $sql="
-                select movie.id,chanel.group_id,
-                @num := if(@chanel = chanel.group_id, @num+1, 1) as row_number,
-                @chanel := chanel.group_id as row_group
+                select *,
+                @num := if(@chanel = group_id, @num+1, 1) as row_number,
+                @chanel := group_id as row_chanel
+                from
+                (select movie.id,movie.title,movie.length,movie.chanel_id,
+                    unix_timestamp(movie.created_at) as created_at,
+                    unix_timestamp(movie.updated_at) as updated_at,
+                    chanel.group_id
                 from movie
-                inner join chanel on chanel.id=movie.chanel_id
-                where chanel.group_id in ('".implode($group_ids,"','")."')
-                group by chanel.group_id,movie.id
+                join chanel on chanel.id=movie.chanel_id
+                where group_id in ('".implode($group_ids,"','")."')
+                order by chanel.group_id, movie.created_at desc) as f
+                group by group_id,created_at desc, id
                 having row_number<=?
-                order by chanel.group_id,movie.created_at ";
+                order by group_id,created_at desc";
         $result=DBConnection::read()->select($sql,array($limit));
 
         $group_movies=array();
+
         foreach ($result as $item) {
             if(!array_key_exists($item->group_id,$group_movies)) {
                 $group_movies[$item->group_id]=array();

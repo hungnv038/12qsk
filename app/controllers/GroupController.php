@@ -11,17 +11,11 @@ class GroupController extends BaseController{
     {
         try {
             $device_id=Device::getInstance()->authentication();
-            $limit=InputHelper::getInput('limit',false,3);
-            $number_view=InputHelper::getInput('views',false,PHP_INT_MAX);
-            $loaded_ids=InputHelper::getInput("loaded_ids",false,array());
+            $limit=InputHelper::getInput('limit',false,Constants::NUMBER_NEWEST_ITEMS);
 
-            if(!is_array($loaded_ids)) {
-                $loaded_ids = preg_split("/,/", $loaded_ids);
-            }
+            $list=Chanel::getInstance()->getList($group_id,$device_id,$limit);
 
-            $list=Chanel::getInstance()->getList($group_id,$device_id,$limit,$loaded_ids,$number_view);
-
-            return ResponseBuilder::success(array('id'=>$device_id,'chanels'=>$list));
+            return ResponseBuilder::success(array('group_id'=>intval($group_id),'chanels'=>$list));
         } catch(Exception $e) {
             return ResponseBuilder::error($e);
         }
@@ -29,15 +23,9 @@ class GroupController extends BaseController{
     public function getList() {
         try {
             $device_id=Device::getInstance()->authentication();
-            $limit=InputHelper::getInput('limit',false,3);
-            $number_view=InputHelper::getInput('views',false,PHP_INT_MAX);
-            $loaded_ids=InputHelper::getInput("loaded_ids",false,array());
+            $limit=InputHelper::getInput('limit',false,Constants::NUMBER_NEWEST_ITEMS);
 
-            if(!is_array($loaded_ids)) {
-                $loaded_ids = preg_split("/,/", $loaded_ids);
-            }
-
-            $list=Group::getInstance()->getList($device_id,$number_view,$limit,$loaded_ids);
+            $list=Group::getInstance()->getList($device_id,$limit);
 
             return ResponseBuilder::success(array('id'=>$device_id,'groups'=>$list));
         } catch(Exception $e) {

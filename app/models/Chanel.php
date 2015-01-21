@@ -43,19 +43,31 @@ class Chanel extends ModelBase{
         return (object)$new_object;
     }
 
-    public function getList($group_id,$device_id,$limit,$loaded_ids,$number_view) {
-        $watched_chanels=$this->getWatchedList($group_id,$device_id,$number_view,$limit,$loaded_ids);
+    public function getList($group_id,$device_id,$limit) {
+        $watched_chanels=$this->getWatchedList($group_id,$device_id);
 
-        $watched_ids=array();
+        $chanel_ids=array();
         foreach($watched_chanels as $item) {
-            $watched_ids[]=$item->id;
+            $chanel_ids[]=$item->id;
         }
-        $group_movies=Movie::getInstance()->getNewestInChanels($watched_ids,Constants::NUMBER_NEWEST_ITEMS);
+
+        $unwatched_chanels=$this->getUnWatchedList($group_id,$chanel_ids);
+
+        foreach($unwatched_chanels as $item) {
+            $chanel_ids[]=$item->id;
+        }
+
+        $chanel_movies=Movie::getInstance()->getNewestInChanels($chanel_ids,$limit);
+
+        $chanels=array();
+        $chanels=array_merge($watched_chanels,$unwatched_chanels);
 
         $response=array();
 
-        foreach ($watched_chanels as $item) {
-            $response[]=$this->composeResponse($item,$group_movies[$item->id]);
+        foreach ($chanels as $item) {
+            if(isset($chanel_movies[$item->id])) {
+                $response[]=$this->composeResponse($item,$chanel_movies[$item->id]);
+            }
         }
 
         return $response;
@@ -68,14 +80,12 @@ class Chanel extends ModelBase{
         }
 
         $chanel=(array)$chanel;
-        $chanel['movies']=array();
 
-        $movie_ids=array();
-        foreach ($movies as $item) {
-            $movie_ids[]=$item->id;
+        if(!isset($chanel['number_view'])) {
+            $chanel['number_view']=0;
         }
 
-        $movies=Movie::getInstance()->getObjectsByFields(array('id'=>$movie_ids));
+        $chanel['movies']=array();
 
         foreach ($movies as $movie) {
             $chanel['movies'][]=Movie::getInstance()->composeResponse($movie);
@@ -92,7 +102,19 @@ class Chanel extends ModelBase{
         return $this->composeResponse($chanel,$movies);
     }
 
-    private function getWatchedList($group_id,$device_id,$view_number,$limit,$loaded_ids) {
+    private function getUnWatchedList($group_id,$watched_ids) {
+        $sql="select chanel.*,
+        unix_timestamp(chanel.created_at) as created_at,
+        unix_timestamp(chanel.updated_at) as updated_at
+        from chanel
+        where id not in ('".implode($watched_ids,"','")."') and group_id=?
+        order by created_at desc";
+
+        $result=DBConnection::read()->select($sql,array($group_id));
+        return $result;
+    }
+
+    private function getWatchedList($group_id,$device_id) {
         $sql="select chanel.*,
         unix_timestamp(chanel.created_at) as created_at,
         unix_timestamp(chanel.updated_at) as updated_at,
@@ -100,14 +122,12 @@ class Chanel extends ModelBase{
         from chanel
         inner join movie on movie.chanel_id=chanel.id
         inner join device_movie_action on device_movie_action.movie_id=movie.id
-        where device_movie_action.event=? and device_id=? and chanel.id not in ('".implode($loaded_ids,"','")."')
+        where device_movie_action.event=? and device_id=?
         and group_id=?
         group by chanel.id
-        having number_view <=?
-        order by count(device_movie_action.id) desc, updated_at desc
-        limit ? offset 0";
+        order by count(device_movie_action.id) desc, updated_at desc";
 
-        $result=DBConnection::read()->select($sql,array('view',$device_id,$group_id,$view_number,$limit));
+        $result=DBConnection::read()->select($sql,array('view',$device_id,$group_id));
 
         return $result;
     }

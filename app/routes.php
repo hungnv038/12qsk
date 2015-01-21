@@ -67,12 +67,13 @@ Route::get('/test/view', function() {
 });
 
 // TEST
-Route::get('/test/device', function() {
+Route::get('/test/chanel', function() {
 
-    for($i=1;$i<100;$i++) {
+    for($i=1;$i<50;$i++) {
+        $group_id=rand(1,15);
 
-        DBConnection::write()->insert("Insert into device (id,created_at,os_version,device_name) VALUES (?,now(),?,?)",
-            array(strval($i),"android","GT9300"));
+        DBConnection::write()->insert("insert into chanel (name,group_id) VALUES (?,?)",
+            array("Chanel #".$i,$group_id));
     }
 });
 Route::get('/test', function() {
@@ -80,7 +81,7 @@ Route::get('/test', function() {
     $i=0;
     for($i=$offset;$i<$offset+200;$i++) {
         //$title="Title #".$i;
-        $chanel_id=rand(1,12);
+        $chanel_id=rand(1,49);
         DBConnection::write()->insert("Insert into movie (id,created_at,title,length,chanel_id) VALUES (?,now(),?,6,?)",
             array("Id #".$i,"Title #".$i,$chanel_id));
     }

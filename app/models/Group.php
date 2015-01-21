@@ -89,6 +89,11 @@ class Group extends ModelBase{
             $movie_obj=Movie::getInstance()->composeResponse($movie);
             $group['movies'][]=$movie_obj;
         }
+        $group=(object)$group;
+        $group->id=intval($group->id);
+        $group->created_at=intval($group->created_at);
+        $group->updated_at=intval($group->updated_at);
+        $group->number_view=intval($group->number_view);
         return (object)$group;
     }
 } 

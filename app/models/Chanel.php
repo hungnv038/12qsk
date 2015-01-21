@@ -90,7 +90,14 @@ class Chanel extends ModelBase{
         foreach ($movies as $movie) {
             $chanel['movies'][]=Movie::getInstance()->composeResponse($movie);
         }
-        return (object)$chanel;
+        $chanel= (object)$chanel;
+
+        $chanel->id=intval($chanel->id);
+        $chanel->created_at=intval($chanel->created_at);
+        $chanel->updated_at=intval($chanel->updated_at);
+        $chanel->number_view=intval($chanel->number_view);
+
+        return $chanel;
     }
 
     public function get($id,$since,$limit) {

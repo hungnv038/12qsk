@@ -99,7 +99,15 @@ class Movie extends ModelBase {
         $movie=(array)$movie;
         $movie['thumb']="http://img.youtube.com/vi/".$movie['id']."/default.jpg";
 
-        return (object)$movie;
+        $movie= (object)$movie;
+
+        $movie->created_at=intval($movie->created_at);
+        $movie->updated_at=intval($movie->updated_at);
+        $movie->chanel_id=intval($movie->chanel_id);
+        $movie->length=intval($movie->length);
+
+
+        return $movie;
     }
     public function tops() {
         $sql="select id,title,length,chanel_id,

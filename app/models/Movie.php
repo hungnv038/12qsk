@@ -69,8 +69,6 @@ class Movie extends ModelBase {
         }
         if(count($chanel_ids)==0) return null;
 
-        DBConnection::write()->select("set @num:=0,@chanel:=0");
-
         $sql=" select *
                 from (
                     select id,title,length,chanel_id,
@@ -125,8 +123,6 @@ class Movie extends ModelBase {
             $group_ids=array($group_ids);
         }
         if(count($group_ids)==0) return null;
-
-        DBConnection::write()->select("set @num:=0,@chanel:=0");
 
         $sql="
                 select *,

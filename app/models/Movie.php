@@ -169,11 +169,11 @@ class Movie extends ModelBase {
         $movies=array_merge($movies,$newers);
 
         if(count($newers)<$limit) {
-            $olders=$this->getolder($chanel_id,$since,$limit);
+            $olders=$this->getolder($chanel_id,$since,$limit-count($newers));
             $movies=array_merge($movies,$olders);
         }
 
-        return $newers;
+        return $movies;
     }
     private function getNewer($chanel_id,$since,$limit) {
         $sql="select id,title,length,chanel_id,

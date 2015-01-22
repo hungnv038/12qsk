@@ -181,7 +181,7 @@ class Movie extends ModelBase {
                 unix_timestamp(updated_at) as updated_at
                 from movie
                 where chanel_id=? and unix_timestamp(created_at) > ?
-                order by created_at DESC
+                order by created_at
                 limit 0, ?";
         $result=DBConnection::read()->select($sql,array($chanel_id,$since,$limit));
         return $result;

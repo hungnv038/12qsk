@@ -135,4 +135,25 @@ class MovieControllers extends BaseController{
             return ResponseBuilder::error($e);
         }
     }
+    public function getRelatives() {
+        try {
+            Device::getInstance()->authentication();
+            $id=InputHelper::getInput('movie_id',true);
+            $movie=Movie::getInstance()->getOneObjectByField(array('id'=>$id));
+            if($movie==null) {
+                return ResponseBuilder::success(array('movie_id'=>$id,'relatives'=>array()));
+            }
+
+            $relatives=Movie::getInstance()->getRelativeMovies($movie->chanel_id,$movie->created_at,Constants::NUMBER_RELATIVE_ITEMS);
+
+            $movies=array();
+            foreach ($relatives as $item) {
+                $movies[]=Movie::getInstance()->composeResponse($item);
+            }
+            return ResponseBuilder::success(array('movie_id'=>$id,'relatives'=>$movies));
+
+        } catch(Exception $e) {
+            return ResponseBuilder::error($e);
+        }
+    }
 } 

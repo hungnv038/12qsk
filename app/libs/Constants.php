@@ -12,4 +12,5 @@ class Constants
     const ACTION_LIKE='like';
     const NUMBER_NEWEST_ITEMS=3;
     const NUMBER_TOP_ITEMS=3;
+    const NUMBER_RELATIVE_ITEMS=30;
 }

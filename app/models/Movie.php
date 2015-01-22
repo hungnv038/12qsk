@@ -162,5 +162,40 @@ class Movie extends ModelBase {
         }
         return $group_movies;
     }
+    public function getRelativeMovies($chanel_id,$since,$limit) {
+        $movies=array();
+
+        $newers=$this->getNewer($chanel_id,$since,$limit);
+        $movies=array_merge($movies,$newers);
+
+        if(count($newers)<$limit) {
+            $olders=$this->getolder($chanel_id,$since,$limit);
+            $movies=array_merge($movies,$olders);
+        }
+
+        return $newers;
+    }
+    private function getNewer($chanel_id,$since,$limit) {
+        $sql="select id,title,length,chanel_id,
+                unix_timestamp(created_at) as created_at,
+                unix_timestamp(updated_at) as updated_at
+                from movie
+                where chanel_id=? and unix_timestamp(created_at) > ?
+                order by created_at DESC
+                limit 0, ?";
+        $result=DBConnection::read()->select($sql,array($chanel_id,$since,$limit));
+        return $result;
+    }
+    private function getolder($chanel_id,$since,$limit) {
+        $sql="select id,title,length,chanel_id,
+                unix_timestamp(created_at) as created_at,
+                unix_timestamp(updated_at) as updated_at
+                from movie
+                where chanel_id=? and unix_timestamp(created_at) < ?
+                order by created_at DESC
+                limit 0, ?";
+        $result=DBConnection::read()->select($sql,array($chanel_id,$since,$limit));
+        return $result;
+    }
 
 } 

@@ -139,4 +139,8 @@ class Chanel extends ModelBase{
 
         return $result;
     }
+    public function getRelativeMovies($since,$limit) {
+
+
+    }
 } 

@@ -35,7 +35,8 @@ Route::get('/chanels/{id}','ChanelControllers@get');
 // MOVIES
 
 Route::get('/movies/top','MovieControllers@tops');
-Route::get('/movies/{id}','MovieControllers@get');
+Route::get('/movies/relative','MovieControllers@getRelatives');
+//Route::get('/movies/{id}','MovieControllers@get');
 Route::post('/movies/{id}/view','MovieControllers@view');
 Route::post('/movies/{id}/like','MovieControllers@like');
 Route::post('/movies','MovieControllers@add');

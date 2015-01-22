@@ -10,6 +10,6 @@ class BaseController extends Controller {
 
         InputHelper::setInputArray( $input );
 
-        sleep(100);
+        //sleep(100);
     }
 }

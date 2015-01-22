@@ -156,4 +156,24 @@ class MovieControllers extends BaseController{
             return ResponseBuilder::error($e);
         }
     }
+    public function search()
+    {
+        try {
+            $device_id=Device::getInstance()->authentication();
+            $text=InputHelper::getInput('text',true);
+            $offset=InputHelper::getInput('offset',false,0);
+            $limit=InputHelper::getInput('limit',false,Constants::NUMBER_RELATIVE_ITEMS);
+
+            $search_result=Movie::getInstance()->search($text,$limit,$offset);
+
+            $movies=array();
+            foreach ($search_result as $item) {
+                $movies[]=Movie::getInstance()->composeResponse($item);
+            }
+            return ResponseBuilder::success(array('id'=>$device_id,'results'=>$movies));
+
+        } catch(Exception $e) {
+            return ResponseBuilder::error($e);
+        }
+    }
 } 

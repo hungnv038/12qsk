@@ -34,6 +34,7 @@ Route::get('/chanels/{id}','ChanelControllers@get');
 
 // MOVIES
 
+Route::get('/movies/search','MovieControllers@search');
 Route::get('/movies/top','MovieControllers@tops');
 Route::get('/movies/relative','MovieControllers@getRelatives');
 //Route::get('/movies/{id}','MovieControllers@get');

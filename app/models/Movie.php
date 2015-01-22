@@ -197,5 +197,17 @@ class Movie extends ModelBase {
         $result=DBConnection::read()->select($sql,array($chanel_id,$since,$limit));
         return $result;
     }
+    public function search($text,$limit,$offset) {
+        $sql="select id,title,length,chanel_id,
+                unix_timestamp(created_at) as created_at,
+                unix_timestamp(updated_at) as updated_at
+                from movie
+                where MATCH(title)
+                AGAINST(? IN BOOLEAN MODE)
+                limit ? offset ?";
+        $result=DBConnection::read()->select($sql,array($text,$limit,$offset));
+
+        return $result;
+    }
 
 } 

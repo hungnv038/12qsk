@@ -29,7 +29,8 @@ class Movie_Counter extends ModelBase{
     public function updateCount($movie_id,$action,$step) {
         $movie_counter=$this->getOneObjectByField(array('movie_id'=>$movie_id,'event'=>$action));
         if($movie_counter!=null) {
-            $this->update(array('cnt'=>"cnt+$step"),array('movie_id'=>$movie_id,'event'=>$action));
+            $cnt=$movie_counter->cnt+$step;
+            $this->update(array('cnt'=>$cnt),array('movie_id'=>$movie_id,'event'=>$action));
         } else {
             // insert new
             $this->insert(array(

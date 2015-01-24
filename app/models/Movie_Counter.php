@@ -6,7 +6,7 @@
  * Time: 23:18
  */
 
-class Movie_Counter extends DBAccess{
+class Movie_Counter extends ModelBase{
     private static $instance;
 
     public static function getInstance()
@@ -27,8 +27,18 @@ class Movie_Counter extends DBAccess{
     }
 
     public function updateCount($movie_id,$action,$step) {
-        $this->update(array('cnt'=>"cnt+$step"),array('movie_id'=>$movie_id,'event'=>$action));
-
+        $movie_counter=$this->getOneObjectByField(array('movie_id'=>$movie_id,'event'=>$action));
+        if($movie_counter!=null) {
+            $this->update(array('cnt'=>"cnt+$step"),array('movie_id'=>$movie_id,'event'=>$action));
+        } else {
+            // insert new
+            $this->insert(array(
+                'created_at'=>array('now()'),
+                'movie_id'=>$movie_id,
+                'event'=>$action,
+                'cnt'=>1
+            ));
+        }
         Movie::getInstance()->updateCount($movie_id,$action,$step);
     }
 

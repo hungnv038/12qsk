@@ -13,7 +13,7 @@ class CacheAccessor {
     private $prefix='';
 
     private $available_keys=array(
-        'chanel','device','movie');
+        'chanel','device','movie','movie_counter');
     public static function getInstance()
     {
         if(self::$instance == null) {

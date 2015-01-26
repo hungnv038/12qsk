@@ -61,7 +61,7 @@ class Movie extends ModelBase {
               where chanel_id=? and unix_timestamp(movie.created_at) < ?
               order by movie.created_at DESC
               limit 0, ?";
-        $result=DBConnection::read()->select($sql,array($chanel_id,$since,$limit));
+        $result=DBConnection::read()->select($sql,array('view',$chanel_id,$since,$limit));
 
         return $result;
     }

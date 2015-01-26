@@ -58,8 +58,8 @@ class Movie extends ModelBase {
                 cnt as number_view
               from movie
               left join movie_counter on movie.id=movie_counter.movie_id and event=?
-              where chanel_id=? and unix_timestamp(created_at) < ?
-              order by created_at DESC
+              where chanel_id=? and unix_timestamp(movie.created_at) < ?
+              order by movie.created_at DESC
               limit 0, ?";
         $result=DBConnection::read()->select($sql,array($chanel_id,$since,$limit));
 
@@ -81,7 +81,7 @@ class Movie extends ModelBase {
                     from movie
                     left join movie_counter on movie.id=movie_counter.movie_id and event=?
                     where chanel_id in ('".implode($chanel_ids,"','")."')
-                    group by chanel_id,created_at desc,id) as f
+                    group by chanel_id,movie.created_at desc,id) as f
                 where row_number<=?
                 order by chanel_id,created_at desc,id";
         $result=DBConnection::read()->select($sql,array('view',$limit));

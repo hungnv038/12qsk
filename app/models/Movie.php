@@ -110,7 +110,7 @@ class Movie extends ModelBase {
         $movie->updated_at=intval($movie->updated_at);
         $movie->chanel_id=intval($movie->chanel_id);
         $movie->length=intval($movie->length);
-        $movie->number_view=1000;//intval($movie->number_view);
+        $movie->number_view=intval(1000);//intval($movie->number_view);
 
 
         return $movie;

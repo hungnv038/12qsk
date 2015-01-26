@@ -52,7 +52,7 @@ class Movie extends ModelBase {
         }
     }
     public function getByChanelId($chanel_id,$since,$limit) {
-        $sql="select id,title,length,chanel_id,
+        $sql="select movie.id,title,length,chanel_id,
                 unix_timestamp(movie.created_at) as created_at,
                 unix_timestamp(movie.updated_at) as updated_at,
                 cnt as number_view

@@ -215,9 +215,9 @@ class Movie extends ModelBase {
                 cnt as number_view
                 from movie
                 left join movie_counter on movie.id=movie_counter.movie_id and event=?
-                where title like ?
+                where title like '%".$text."%'
                 limit ? offset ?";
-        $result=DBConnection::read()->select($sql,array('view',"'%".$text."%'",$limit,$offset));
+        $result=DBConnection::read()->select($sql,array('view',$limit,$offset));
 
         return $result;
     }

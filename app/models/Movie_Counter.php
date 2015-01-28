@@ -40,7 +40,7 @@ class Movie_Counter extends ModelBase{
                 'cnt'=>1
             ));
         }
-        Movie::getInstance()->updateCount($movie_id,$action,$step);
+        //Movie::getInstance()->updateCount($movie_id,$action,$step);
     }
 
     public function inserts($fields = array(), $fieldValues = array())

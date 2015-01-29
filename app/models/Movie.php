@@ -54,14 +54,12 @@ class Movie extends ModelBase {
     public function getByChanelId($chanel_id,$since,$limit) {
         $sql="select movie.id,title,length,chanel_id,
                 unix_timestamp(movie.created_at) as created_at,
-                unix_timestamp(movie.updated_at) as updated_at,
-                cnt as number_view
+                unix_timestamp(movie.updated_at) as updated_at
               from movie
-              left join movie_counter on movie.id=movie_counter.movie_id and event=?
               where chanel_id=? and unix_timestamp(movie.created_at) < ?
               order by movie.created_at DESC
               limit 0, ?";
-        $result=DBConnection::read()->select($sql,array('view',$chanel_id,$since,$limit));
+        $result=DBConnection::read()->select($sql,array($chanel_id,$since,$limit));
 
         return $result;
     }
@@ -77,14 +75,13 @@ class Movie extends ModelBase {
                     unix_timestamp(movie.created_at) as created_at,
                     unix_timestamp(movie.updated_at) as updated_at,
                     @num := if(@chanel = chanel_id, @num+1, 1) as row_number,
-                    @chanel := chanel_id as chanel,cnt as number_view
+                    @chanel := chanel_id as chanel
                     from movie
-                    left join movie_counter on movie.id=movie_counter.movie_id and event=?
                     where chanel_id in ('".implode($chanel_ids,"','")."')
                     group by chanel_id,movie.created_at desc,id) as f
                 where row_number<=?
                 order by chanel_id,created_at desc,id";
-        $result=DBConnection::read()->select($sql,array('view',$limit));
+        $result=DBConnection::read()->select($sql,array($limit));
 
         $chanel_movies=array();
         foreach ($result as $item) {
@@ -111,7 +108,7 @@ class Movie extends ModelBase {
         $movie->chanel_id=intval($movie->chanel_id);
         $movie->length=intval($movie->length);
 
-        $number_view=rand(500,1000);
+        $number_view=0;
         $movie->number_view=intval($number_view);
 
 
@@ -120,14 +117,12 @@ class Movie extends ModelBase {
     public function tops() {
         $sql="select id,title,length,chanel_id,
                 unix_timestamp(movie.created_at) as created_at,
-                unix_timestamp(movie.updated_at) as updated_at,
-                cnt as number_view
+                unix_timestamp(movie.updated_at) as updated_at
                 from movie
-                left join movie_counter on movie.id=movie_counter.movie_id and event=?
                 inner join top_movie on movie.id=top_movie.movie_id
                 order by order DESC
                 limit 0, ?";
-        $result=DBConnection::write()->select($sql,array('view',Constants::NUMBER_TOP_ITEMS));
+        $result=DBConnection::write()->select($sql,array(Constants::NUMBER_TOP_ITEMS));
 
         $response=array();
         foreach ($result as $item) {
@@ -150,16 +145,15 @@ class Movie extends ModelBase {
                 (select movie.id,movie.title,movie.length,movie.chanel_id,
                     unix_timestamp(movie.created_at) as created_at,
                     unix_timestamp(movie.updated_at) as updated_at,
-                    chanel.group_id,cnt as number_view
+                    chanel.group_id
                 from movie
-                left join movie_counter on movie.id=movie_counter.movie_id and event=?
                 join chanel on chanel.id=movie.chanel_id
                 where group_id in ('".implode($group_ids,"','")."')
                 order by chanel.group_id, movie.created_at desc) as f
                 group by group_id,created_at desc, id
                 having row_number<=?
                 order by group_id,created_at desc";
-        $result=DBConnection::read()->select($sql,array('view',$limit));
+        $result=DBConnection::read()->select($sql,array($limit));
 
         $group_movies=array();
 
@@ -187,39 +181,33 @@ class Movie extends ModelBase {
     private function getNewer($chanel_id,$since,$limit) {
         $sql="select movie.id,title,length,chanel_id,
                 unix_timestamp(movie.created_at) as created_at,
-                unix_timestamp(movie.updated_at) as updated_at,
-                cnt as number_view
+                unix_timestamp(movie.updated_at) as updated_at
                 from movie
-                left join movie_counter on movie.id=movie_counter.movie_id and event=?
                 where chanel_id=? and unix_timestamp(movie.created_at) > ?
                 order by movie.created_at
                 limit 0, ?";
-        $result=DBConnection::read()->select($sql,array('view',$chanel_id,$since,$limit));
+        $result=DBConnection::read()->select($sql,array($chanel_id,$since,$limit));
         return $result;
     }
     private function getolder($chanel_id,$since,$limit) {
         $sql="select movie.id,title,length,chanel_id,
                 unix_timestamp(movie.created_at) as created_at,
-                unix_timestamp(movie.updated_at) as updated_at,
-                cnt as number_view
+                unix_timestamp(movie.updated_at) as updated_at
                 from movie
-                left join movie_counter on movie.id=movie_counter.movie_id and event=?
                 where chanel_id=? and unix_timestamp(movie.created_at) < ?
                 order by movie.created_at DESC
                 limit 0, ?";
-        $result=DBConnection::read()->select($sql,array('view',$chanel_id,$since,$limit));
+        $result=DBConnection::read()->select($sql,array($chanel_id,$since,$limit));
         return $result;
     }
     public function search($text,$limit,$offset) {
         $sql="select movie.id,title,length,chanel_id,
                 unix_timestamp(movie.created_at) as created_at,
-                unix_timestamp(movie.updated_at) as updated_at,
-                cnt as number_view
+                unix_timestamp(movie.updated_at) as updated_at
                 from movie
-                left join movie_counter on movie.id=movie_counter.movie_id and event=?
                 where title like '%".$text."%'
                 limit ? offset ?";
-        $result=DBConnection::read()->select($sql,array('view',$limit,$offset));
+        $result=DBConnection::read()->select($sql,array($limit,$offset));
 
         return $result;
     }

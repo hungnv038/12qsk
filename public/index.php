@@ -5,7 +5,6 @@
  * @package  Laravel
  * @author   Taylor Otwell <taylorotwell@gmail.com>
  */
-$start=microtime(true);
 /*
 |--------------------------------------------------------------------------
 | Register The Auto Loader
@@ -47,5 +46,3 @@ $app = require_once __DIR__.'/../bootstrap/start.php';
 */
 
 $app->run();
-$after=microtime(true);
-echo $after-$start;

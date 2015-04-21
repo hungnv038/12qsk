@@ -3,7 +3,7 @@
 class APIException extends Exception
 {
     private $http_code=0;
-    public function __construct($message = "", $code = 0,$httpcode=0)
+    public function __construct($message = "", $code = 400,$httpcode=400)
     {
         parent::__construct($message, $code, null);
         if($httpcode==0) {$httpcode=$code;}

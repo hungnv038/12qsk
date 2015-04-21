@@ -96,4 +96,31 @@ class Group extends ModelBase{
         $group->number_view=intval($group->number_view);
         return (object)$group;
     }
+    public function getGroupsChanels() {
+        $sql="select chanel_group.id as group_id,chanel_group.name as group_name,
+            chanel.id as chanel_id,chanel.name as chanel_name from chanel_group
+            inner join chanel on chanel_group.id=chanel.group_id
+            order by chanel_group.id,chanel.id";
+
+        $result=DBConnection::read()->select($sql);
+        $response=array();
+
+        foreach ($result as $group) {
+            $chanel_obj=new stdClass();
+            $chanel_obj->id=$group->chanel_id;
+            $chanel_obj->name=$group->chanel_name;
+            if(array_key_exists($group->group_id,$response)) {
+                $group_obj=$response[$group->group_id];
+            } else {
+                $group_obj=new stdClass();
+                $group_obj->id=$group->group_id;
+                $group_obj->name=$group->group_name;
+                $group_obj->chanels=array();
+                $response[]=$group_obj;
+            }
+
+            $group_obj->chanels[]=$chanel_obj;
+        }
+        return $response;
+    }
 } 

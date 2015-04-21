@@ -11,10 +11,12 @@
 |
 */
 
-Route::get('/', function()
-{
-	return View::make('hello');
-});
+Route::get('/', 'AuthController@index');
+
+
+// HOME
+Route::get('/home/videos/new','HomeController@getAddNewVideoView');
+Route::post('/service/videos','MovieControllers@postNewVideo');
 
 // DEVICES
 Route::post('/devices','DeviceControllers@register');
@@ -49,42 +51,18 @@ Route::get('/apidocs','LogController@getApiDocs');
 Route::get('/getApiDoc','LogController@getApiDoc');
 Route::match(array('GET', 'POST'), '/setApiDoc','LogController@setApiDoc');
 
-// TEST
-Route::get('/test/view', function() {
-     for($i=1;$i<100;$i++) {
-         $number_view=rand(1,20);
-
-         for($j=0;$j<=$number_view;$j++) {
-             try{
-                 $movie_id="Id #".rand(1,500);
-                 DBConnection::write()->insert("insert into device_movie_action (device_id,movie_id,event) VALUES (?,?,?)",
-                     array(strval($i),$movie_id,'view'));
-             } catch(Exception $e) {
-                 continue;
-             }
-         }
+// CRON
+Route::get('/cron/video/status','VideoUploadController@checkVideoStatus');
+Route::get('/cron/video/download','VideoUploadController@download');
+Route::get('/cron/video/upload','VideoUploadController@upload');
+Route::get('/cron','BackgroundProcessController@cron');
 
 
-     }
-});
-
-// TEST
-Route::get('/test/chanel', function() {
-
-    for($i=1;$i<50;$i++) {
-        $group_id=rand(1,15);
-
-        DBConnection::write()->insert("insert into chanel (name,group_id) VALUES (?,?)",
-            array("Chanel #".$i,$group_id));
-    }
-});
-Route::get('/test', function() {
-    $offset=Input::get('index');
-    $i=0;
-    for($i=$offset;$i<$offset+200;$i++) {
-        //$title="Title #".$i;
-        $chanel_id=rand(1,49);
-        DBConnection::write()->insert("Insert into movie (id,created_at,title,length,chanel_id) VALUES (?,now(),?,6,?)",
-            array("Id #".$i,"Title #".$i,$chanel_id));
-    }
+// CHANELS MANAGEMENT
+Route::get('/home/chanels','HomeController@getChanelView');
+Route::get('/home/videos','HomeController@getVideoView');
+// Test
+Route::get('/test',function() {
+    $video_helper=new VideoHelper();
+    $video_helper->isReadyForPublish("Ykd-K2yWdaM");
 });

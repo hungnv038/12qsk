@@ -176,4 +176,26 @@ class MovieControllers extends BaseController{
             return ResponseBuilder::error($e);
         }
     }
+
+    /// home tool
+    public function postNewVideo() {
+        try {
+            $type=InputHelper::getInput('type',true);
+            $video_id=InputHelper::getInput('video_id',true);
+            $title=InputHelper::getInput('title',true);
+            $description=InputHelper::getInput('description',false,'');
+            $chanel_id=InputHelper::getInput('chanel_id',true);
+
+            BackgroundProcess::throwProcess(
+                '/cron/video/download',
+                array('type'=>$type,
+                    'video_id'=>$video_id,
+                    'title'=>$title,
+                    'description'=>$description,
+                    'chanel_id'=>$chanel_id));
+            return ResponseBuilder::success(array('html'=>'Success','error'=>0));
+        } catch(Exception $e) {
+            return ResponseBuilder::success(array('html'=>$e->getMessage(),'error'=>1));
+        }
+    }
 } 

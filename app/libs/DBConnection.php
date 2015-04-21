@@ -6,13 +6,30 @@ class DBConnection
 
     public static function write()
     {
-        self::$db = DB::connection("mysql");
-        return self::$db;
+        $service_app=InputHelper::getServiceName();
+        if($service_app==Constants::APP_MOVIE_HOT) {
+            self::$db = DB::connection("movie_hot");
+            return self::$db;
+        } elseif ($service_app==Constants::APP_WIFI_SHARING) {
+            self::$db = DB::connection("wifi_sharing");
+            return self::$db;
+        } else {
+            return null;
+        }
+
     }
 
     public static function read()
     {
-        if (self::$db) return self::$db;
-        return DB::connection("mysql"); //Slave
+        $service_app=InputHelper::getServiceName();
+        if($service_app==Constants::APP_MOVIE_HOT) {
+            self::$db = DB::connection("movie_hot");
+            return self::$db;
+        } elseif ($service_app==Constants::APP_WIFI_SHARING) {
+            self::$db = DB::connection("wifi_sharing");
+            return self::$db;
+        } else {
+            return null;
+        }
     }
 }

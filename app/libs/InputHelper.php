@@ -10,6 +10,7 @@ class InputHelper
 {
     private static $input;
     private static $access_token;
+    private static $service_app;
     public static function setInputArray( $input ) {
         self::$input = $input;
     }
@@ -65,5 +66,21 @@ class InputHelper
     public static function getAllInput()
     {
         return self::$input;
+    }
+    public static function getServiceName()
+    {
+        if ( self::$service_app ) return self::$service_app;
+
+        $header = Request::header();
+
+        if ( Input::has('serviceapp')) {
+            return Input::get('serviceapp');
+        }  elseif (array_key_exists('serviceapp', $header)) {
+            return $header['serviceapp'][0];
+        }  elseif (array_key_exists('serviceapp', self::$input)) {
+            return self::$input['serviceapp'];
+        } else {
+            return Constants::APP_MOVIE_HOT;
+        }
     }
 }

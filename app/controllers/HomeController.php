@@ -1,23 +1,14 @@
 <?php
 
 class HomeController extends BaseController {
+    public function getAddNewVideoView() {
+        $group_chanels=Group::getInstance()->getGroupsChanels();
+        return View::make('home.add_video',array('groups'=>$group_chanels));
+    }
+    public function getChanelView() {
+        return View::make('home.chanel_index');
+    }
+    public function getVideoView() {
 
-	/*
-	|--------------------------------------------------------------------------
-	| Default Home Controller
-	|--------------------------------------------------------------------------
-	|
-	| You may wish to use controllers instead of, or in addition to, Closure
-	| based routes. That's great! Here is an example controller method to
-	| get you started. To route to this controller, just add the route:
-	|
-	|	Route::get('/', 'HomeController@showWelcome');
-	|
-	*/
-
-	public function showWelcome()
-	{
-		return View::make('hello');
-	}
-
+    }
 }

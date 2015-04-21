@@ -31,7 +31,7 @@ ClassLoader::addDirectories(array(
 |
 */
 
-/*Log::listen(function($level, $message, $context) {
+Log::listen(function($level, $message, $context) {
     // Save the php sapi and date, because the closure needs to be serialized
     //$apiName = php_sapi_name();
     $apiName = Route::getCurrentRoute()->getPath();
@@ -52,7 +52,7 @@ ClassLoader::addDirectories(array(
             $endTime
         ));
     });
-});*/
+});
 
 /*
 |--------------------------------------------------------------------------

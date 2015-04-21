@@ -1,5 +1,5 @@
 var HomeModule = {
-    urlApi: '/12qsk/public/',
+    urlApi: '/live',
     addNewYoutubeVideo : function (myself) {
         var video_id=$('#video_id_youtube').val();
         var title=$('#title_youtube').val();

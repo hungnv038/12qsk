@@ -21,7 +21,6 @@ class ResponseBuilder extends Response
     }
     public static function success($result=null)
     {
-        QueryHelper::LogQueries();
         if($result!=null) {
             return Response::json($result);
         }

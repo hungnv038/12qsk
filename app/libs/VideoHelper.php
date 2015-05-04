@@ -272,18 +272,24 @@ class VideoHelper {
                     file_put_contents('token.txt', $client->getAccessToken());
                 }
                 $youtube = new Google_Service_YouTube($client);
-                $video_status=$youtube->videos->listVideos('processingDetails',array('id'=>$video_id));
+                $video_status=$youtube->videos->listVideos('processingDetails,contentDetails',array('id'=>$video_id));
                 if(count($video_status->getItems())>0) {
                     $item=$video_status->getItems()[0];
+                    if(isset($item->contentDetails)) {
+                        $contentDetails=$item->contentDetails;
+                        if(isset($contentDetails->regionRestriction)) {
+                            return -1;
+                        }
+                    }
                     if(isset($item->processingDetails)) {
                         $processing_detail=$item->processingDetails;
                         if(array_key_exists('processingStatus',$processing_detail) && $processing_detail['processingStatus']=='succeeded') {
                             //ready for publish on client.
-                            return true;
+                            return 1;
                         }
                     }
                 }
-                return false;
+                return 0;
             }
         } catch(Exception $e) {
             throw $e;

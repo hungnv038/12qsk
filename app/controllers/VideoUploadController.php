@@ -71,9 +71,14 @@ class VideoUploadController  extends BaseController {
         try {
             $video_id=InputHelper::getInput('video_id',true);
             $video_helper=new VideoHelper();
-            if($video_helper->isReadyForPublish($video_id)) {
+            $video_status=$video_helper->isReadyForPublish($video_id);
+            if($video_status==1) {
                 // update is_ready=true on database
                 Movie::getInstance()->update(array('is_ready'=>1),array('id'=>$video_id));
+            } elseif($video_status==-1) {
+                // delete blocked video
+                Log::info("Video ".$video_id." is blocked");
+                Movie::getInstance()->delete(array('id'=>$video_id));
             } else {
                 // create process to check again
                 BackgroundProcess::getInstance()->throwProcess('/cron/video/status',array('video_id'=>$video_id));

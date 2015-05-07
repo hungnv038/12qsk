@@ -186,6 +186,14 @@ class MovieControllers extends BaseController{
             $description=InputHelper::getInput('description',false,'');
             $chanel_id=InputHelper::getInput('chanel_id',true);
 
+            if($type==Constants::VIDEO_YOUTUBE) {
+                $video_helper=new VideoHelper();
+                if($video_helper->isVideoLicensed($video_id)) {
+                    throw new Exception("Video is Licensed, You can not add this video to MovieHot!");
+                }
+            }
+
+
             BackgroundProcess::throwProcess(
                 '/cron/video/download',
                 array('type'=>$type,

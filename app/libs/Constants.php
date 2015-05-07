@@ -29,5 +29,5 @@ class Constants
     const YOUTUBE_VIDEO_TAG1='MovieHot';
     const YOUTUBE_VIDEO_TAG2='Movie Hot';
     const YOUTUBE_ACCESS_TYPE='offline';
-    const YOUTUBE_VIDEO_PRIVACY='public';
+    const YOUTUBE_VIDEO_PRIVACY='private';
 }

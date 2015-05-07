@@ -63,6 +63,7 @@ Route::get('/home/chanels','HomeController@getChanelView');
 Route::get('/home/videos','HomeController@getVideoView');
 // Test
 Route::get('/test',function() {
-    $video_helper=new VideoHelper();
-    $video_helper->isReadyForPublish("Ykd-K2yWdaM");
+    $db=DBConnection::write();
+    $db->delete("delete from movie where id=?",array(3303125));
+   // Movie::getInstance()->delete(array('id'=>3303125));
 });

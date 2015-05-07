@@ -66,7 +66,7 @@ class VideoHelper {
         return utf8_decode($my_description);
     }
     public function downloadYoutubeVideo($video_id) {
-        $my_video_info = 'http://www.youtube.com/get_video_info?&video_id='.$video_id; //video details fix *1
+        $my_video_info = 'http://www.youtube.com/get_video_info?&video_id='.$video_id."&el=embedded&ps=default&eurl=&hl=en_US"; //video details fix *1
         $my_video_info = $this->curlGet($my_video_info);
 
         $thumbnail_url = $title = $url_encoded_fmt_stream_map = $type = $url = '';
@@ -246,7 +246,7 @@ class VideoHelper {
             throw $e;
         }
     }
-    public function isReadyForPublish($video_id) {
+    public function getVideoDetail($part,$video_id) {
         $key = file_get_contents('token.txt');
         $client_secret = Constants::YOUTUBE_CLIENT_SECRET;
         $client_id = Constants::YOUTUBE_CLIENT_ID;
@@ -272,25 +272,50 @@ class VideoHelper {
                     file_put_contents('token.txt', $client->getAccessToken());
                 }
                 $youtube = new Google_Service_YouTube($client);
-                $video_status=$youtube->videos->listVideos('processingDetails,contentDetails',array('id'=>$video_id));
-                if(count($video_status->getItems())>0) {
-                    $item=$video_status->getItems()[0];
-                    if(isset($item->contentDetails)) {
-                        $contentDetails=$item->contentDetails;
-                        if(isset($contentDetails->regionRestriction)) {
-                            return -1;
-                        }
-                    }
-                    if(isset($item->processingDetails)) {
-                        $processing_detail=$item->processingDetails;
-                        if(array_key_exists('processingStatus',$processing_detail) && $processing_detail['processingStatus']=='succeeded') {
-                            //ready for publish on client.
-                            return 1;
-                        }
+                $video_status=$youtube->videos->listVideos($part,array('id'=>$video_id));
+                return $video_status;
+            }
+        } catch(Exception $e) {
+            throw $e;
+        }
+    }
+    public function isReadyForPublish($video_id) {
+        try {
+            $video_status=$this->getVideoDetail('processingDetails,contentDetails',$video_id);
+            if(count($video_status->getItems())>0) {
+                $item=$video_status->getItems()[0];
+                if(isset($item->contentDetails)) {
+                    $contentDetails=$item->contentDetails;
+                    if(isset($contentDetails->regionRestriction)) {
+                        return -1;
                     }
                 }
-                return 0;
+                if(isset($item->processingDetails)) {
+                    $processing_detail=$item->processingDetails;
+                    if(array_key_exists('processingStatus',$processing_detail) && $processing_detail['processingStatus']=='succeeded') {
+                        //ready for publish on client.
+                        return 1;
+                    }
+                }
             }
+            return 0;
+        } catch(Exception $e) {
+            throw $e;
+        }
+    }
+    public function isVideoLicensed($video_id) {
+        try {
+            $video_status=$this->getVideoDetail("contentDetails",$video_id);
+            if(count($video_status->getItems())>0) {
+                $item = $video_status->getItems()[0];
+                if (isset($item->contentDetails)) {
+                    $contentDetails = $item->contentDetails;
+                    if (isset($contentDetails->licensedContent) && $contentDetails->licensedContent==true) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         } catch(Exception $e) {
             throw $e;
         }
